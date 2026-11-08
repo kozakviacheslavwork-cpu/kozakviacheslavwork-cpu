@@ -10,6 +10,8 @@ Before moving into analytics, I worked in banking, the State Treasury and logist
 
 ### Selected projects
 
+- [Retail Sales Performance & Customer Insights](https://github.com/kozakviacheslavwork-cpu/kozakviacheslavwork-cpu/tree/main/projects/retail-sales-google-sheets) — Google Sheets dashboard, KPI reconciliation, brand analysis and data quality checks.
+
 - [Tableau dashboards](https://github.com/kozakviacheslavwork-cpu/tableau-analytics-portfolio) — ecommerce conversion, SaaS revenue, cohorts and user engagement.
 - [Stack Overflow survey](https://github.com/kozakviacheslavwork-cpu/stack-overflow-developer-survey-analysis) — work experience, remote work and compensation across 49,191 responses.
 - [Movie data analysis](https://github.com/kozakviacheslavwork-cpu/movie-analysis-project) — preparing JSON data and exploring genres and cast credits with Python.
