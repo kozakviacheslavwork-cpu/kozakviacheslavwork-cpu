@@ -1,72 +1,81 @@
-# Retail Sales Performance & Customer Insights
+# Аналіз продажів і клієнтів | Google Sheets
 
-**Google Sheets · Retail Analytics · KPI Reporting · Data Quality · Interactive Dashboard**
+**Навчальний пет-проєкт для портфоліо Junior Data Analyst** · Google Sheets · Data Quality · EDA · RFM · Dashboard
 
-An extended portfolio case study based on a guided Google Sheets course by Nikita Tymoshenko. I independently audited the calculations, corrected transaction-count logic, excluded cancelled orders, added a dynamic brand filter, built five dashboard charts and documented all metric assumptions.
+> **Походження:** проєкт створено на основі навчального курсу Нікіти Тимошенка, з подальшою перевіркою даних, виправленням метрик, новим інтерактивним дашбордом і власним RFM-аналізом. Це **не** комерційна робота та **не** офіційний звіт KPMG.
 
-> **Educational dataset:** Australian bicycle retail transactions, January–December 2017. Financial figures are proxies derived from source prices and standard costs, **not** audited company revenue or net profit.
+![Помісячна динаміка продажів](assets/monthly_sales_trend.svg)
 
-![Sales trend](assets/monthly_sales_trend.svg)
+## Бізнес-завдання
 
-## Business questions
+На основі транзакцій велосипедного ритейлу Австралії за 2017 рік проаналізувати продажі, прибутковість, канали, бренди й поведінку клієнтів, а також перевірити якість даних перед висновками.
 
-- What are the list-price sales, profit proxy, average order value and customer count for **approved** transactions?
-- Which months, brands and product lines lead on performance?
-- How balanced are online versus in-store transactions?
-- Which Australian states account for the highest value, with unknown records explicitly tracked?
-- Can dashboard numbers be reconciled with the underlying data?
+## Результати (лише схвалені транзакції)
 
-## Headline KPIs
-
-| Metric | Approved transactions only |
+| KPI | Значення |
 |---|---:|
-| Approved orders | **19,625** |
-| Cancelled orders excluded | **178** |
-| List-price sales proxy | **$21,739,495.00** |
-| Profit proxy (price minus standard cost) | **$10,831,504.00** |
-| Profit-proxy margin | **49.82%** |
-| Unique purchasing customer IDs | **3,493** |
-| Average transaction value | **$1,108.00** |
+| Початкові транзакції | 20 000 |
+| Після очищення | 19 803 |
+| Схвалені транзакції | **19 625** |
+| Скасовані транзакції | 178 |
+| Продажі за прайсом (list_price) | **$21 739 495,29** |
+| Розрахунковий прибуток (list_price − standard_cost) | **$10 831 504,03** |
+| Розрахункова маржа | **49,82%** |
+| Клієнти з коректним ID | **3 482** |
+| Середня сума транзакції | **$1 107,74** |
 
-**Key findings:** Solex leads by list-price sales; WeareA2B leads by profit proxy. Oct has the highest monthly sales in 2017, while Sep has the lowest. 352 approved transactions have an unknown sales channel.
+**Важливо:** продажі за прайсом — не обов'язково підтверджена виручка, а різниця ціни та стандартної собівартості — не бухгалтерський чистий прибуток.
 
-## Google Sheets implementation
+## Дашборд
 
-The private working workbook includes **Portfolio Dashboard**, **Portfolio Metrics**, and **Project Notes** as the portfolio deliverable. It features five KPI tiles, five charts, a brand dropdown, formula-backed summaries and a reconciliation block returning **PASS**.
+У приватній робочій Google-таблиці залишено чотири видимі вкладки:
 
-The **brand filter** changes key KPIs, the monthly trend, channel mix and product-line performance. The brand comparison and regional snapshot intentionally stay **all-brand benchmarks**.
+1. **Дашборд** — п'ять KPI, п'ять діаграм і фільтр за брендом.
+2. **Аналітичний звіт** — якість даних, EDA, клієнти, RFM та короткі рекомендації.
+3. **Розрахунки** — формули, агрегати й перевірка узгодженості.
+4. **Методологія** — визначення метрик, джерела та обмеження.
 
-The interactive workbook is currently **private**. A public view link should be added only after reviewing the legacy source tabs and their customer/address columns.
+Джерела й технічні обчислення збережено в прихованих вкладках. **Оригінальні навчальні файли не змінено.**
 
-## Files
+> Робоча таблиця поки що приватна: її не публікуємо разом із персональними полями навчального набору даних. На GitHub доступні тільки зведені агрегати.
 
-- `data/kpi_snapshot.csv` — metric definitions and audited top-line values
-- `data/monthly_performance.csv` — approved monthly metrics
-- `data/brand_performance.csv` — brand orders, sales and profit proxy
-- `data/channel_performance.csv` — online, in-store, unknown mix
-- `data/product_line_performance.csv` — product category breakdown
-- `data/regional_performance_snapshot.csv` — **static** regional breakdown
-- `assets/monthly_sales_trend.svg` — chart derived from audited aggregates
-- `METHODOLOGY.md` — definitions, quality checks and limitations
+## Висновки
 
-**Privacy:** Only aggregate CSVs are published. Customer names, street addresses, and raw records are excluded.
+- **Solex** має найбільший обсяг продажів за прайсом, **WeareA2B** — найбільший розрахунковий прибуток.
+- **Жовтень** — місяць найбільших продажів у спостережуваному 2017 році.
+- Онлайн: **9 642**, офлайн: **9 631** схвалена транзакція; **352** — невідомий канал.
+- **43 транзакції** мають технічний ID формату `unkown...` (11 різних заглушок). Вони входять у продажі, але не в розрахунок унікальних клієнтів та RFM.
+- RFM на **3 482** підтверджених ID: 897 «активних цінних», 562 «цінних неактивних», 705 «активних, які купують рідко», 1 318 інших.
 
-## Audit and limitations
+## Що реалізовано
 
-- There were **178 cancelled transactions** that should not be included in completed-sale totals.
-- Transaction count is a **COUNT**, never `SUM(transaction_id)`.
-- The source contains the misspelled channel category `UNKOWN`; it is shown as **Unknown**, rather than silently treated as online/offline.
-- Source `Address_clean` uses an external Google Sheets `IMPORTDATA` connection that may show `#REF!` without explicit permission. Regional figures are therefore a **verified static snapshot** from the user's downloaded XLSX export, joined by customer ID; 87 transactions remain unmapped.
-- `list_price` is not verified settled revenue and `list_price - standard_cost` is not full accounting net profit.
-- Only 2017 is included; no multi-year trend can be inferred.
+- Очищення та перевірку статусів, категорій і клієнтських ID.
+- Формульні агрегати `SUMIFS`, `COUNTIFS`, `COUNTUNIQUE`, `FILTER`, `QUERY`, `ARRAYFORMULA`.
+- Прозорі визначення KPI та незалежні перевірки підсумків (**ПРОЙДЕНО**).
+- Динамічний вибір бренду для KPI, місячного тренду, каналів та категорій.
+- RFM-квартилі станом на **01.01.2018**, без підміни історичної дати функцією `TODAY()`.
 
-## Skills
+## Файли репозиторію
 
-Google Sheets · SUMIFS · COUNTIFS · COUNTUNIQUE · data cleaning · Excel · data quality · KPI definitions · business analytics · dashboarding.
+- `data/kpi_snapshot.csv` — перевірені KPI.
+- `data/monthly_performance.csv` — динаміка продажів за місяцями.
+- `data/brand_performance.csv` — результати брендів.
+- `data/channel_performance.csv` — канали продажів.
+- `data/product_line_performance.csv` — категорії товарів.
+- `data/regional_performance_snapshot.csv` — статичний зріз регіонів.
+- `data/rfm_segments.csv` — агреговані результати RFM.
+- `METHODOLOGY.md` — методика, перевірки та обмеження.
 
-## Credits
+## Обмеження
 
-- [Nikita Tymoshenko — Google Sheets Data Analytics tutorial](https://youtu.be/gYjQRW6N6Ws)
-- [Source materials referenced in the original workbook](https://github.com/Youtube-NikitaTymoshenko/googleSheets-course)
+**Регіони:** імпорт адрес у Google Sheets і live-об'єднання за ID не дають стабільно узгоджених результатів; тому використовується звірений **статичний зріз**, який не змінюється з фільтром бренду.
 
-The tutorial and initial dataset belong to their respective authors. The data audit, approved-only metric policy, filter and visual redesign, reconciliation and reporting structure are independent extensions.
+**RFM:** сегментація описує поведінку тільки протягом 2017 року; «неактивний» не означає доведений відтік. Повноцінний когортний retention-аналіз не додавався, щоб не робити висновків без повної історії.
+
+**Конфіденційність:** імена, адреси, дати народження та транзакції окремих клієнтів не публікуються.
+
+## Джерела
+
+- [Нікіта Тимошенко — навчальний курс Google Sheets](https://youtu.be/gYjQRW6N6Ws)
+- [Матеріали навчального курсу](https://github.com/Youtube-NikitaTymoshenko/googleSheets-course)
+- Зразки *KPMG Data Analytics Virtual Program* (Data Quality, EDA, Customers, RFM) використовувалися лише як орієнтир структури. Їхні показники не перенесені до результатів цього проєкту.
