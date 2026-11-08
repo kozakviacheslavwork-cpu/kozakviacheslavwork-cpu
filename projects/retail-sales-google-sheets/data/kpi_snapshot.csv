@@ -1,10 +1,11 @@
-metric,value,definition
-Approved orders,19625,order_status = Approved
-Cancelled orders,178,order_status = Cancelled
-List-price sales proxy USD,21739495.29,SUM(list_price) on Approved
-Profit proxy USD,10831504.03,SUM(list_price - standard_cost) on Approved
-Profit-proxy margin,0.49824,Profit proxy / list-price sales
-Distinct buyer IDs,3493,COUNTUNIQUE(customer_id) on Approved
-Average transaction value USD,1107.74,List-price sales / approved orders
-Unknown channel orders,352,Source literal UNKOWN
-Unmapped state orders,87,No normalized state match
+показник,значення,пояснення
+Схвалені транзакції,19625,order_status = Approved
+Скасовані транзакції,178,order_status = Cancelled
+Продажі за прайсом USD,21739495.29,"SUM(list_price), лише Approved"
+Розрахунковий прибуток USD,10831504.03,"SUM(list_price - standard_cost), лише Approved"
+Розрахункова маржа,0.49824,Розрахунковий прибуток / продажі за прайсом
+Унікальні клієнти з коректним ID,3482,Технічні unkown ID виключено
+Середня сума транзакції USD,1107.74,Продажі за прайсом / схвалені транзакції
+Невідомий канал,352,Значення UNKOWN
+Транзакції з технічними ID,43,Технічні заглушки unkown
+Не зіставлений регіон,87,Статичний географічний зріз
