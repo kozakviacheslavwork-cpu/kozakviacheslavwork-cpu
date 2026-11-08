@@ -1,36 +1,53 @@
-# Methodology & Quality Assurance
+# Методологія та контроль якості
 
-## Source and population
+## 1. Обсяг даних
 
-- User's educational Google Sheets workbook, imported from the attached XLSX snapshot.
-- Clean transaction rows: 19803 with recognized order statuses.
-- **Approved:** 19625; **Cancelled:** 178; timeframe: 2017.
-- Regional aggregation: join of approved transaction customer IDs to XLSX-exported address records; state names standardized to NSW, VIC and QLD. Unmatched IDs are **Unmapped**.
+- **20 000** початкових транзакцій.
+- **19 803** після первинного очищення (вилучено 197 неповних рядків).
+- **19 625** зі статусом `Approved`, **178** зі статусом `Cancelled` (в основні продажі не входять).
+- **352** схвалені транзакції мають канал `UNKOWN` — залишені окремою категорією.
+- **43** схвалені транзакції використовують текстові заглушки `unkown...`, що відповідають **11** унікальним технічним ID; сума їхніх `list_price` — **$49 081,98**.
+- Для аналізу покупців використано **3 482** унікальні коректні ID. Технічні заглушки вилучені з RFM, але не із загальних продажів.
 
-## Metrics
+## 2. Визначення метрик
 
-| KPI | Implementation |
+| Метрика | Розрахунок |
 |---|---|
-| Approved orders | `COUNTIF(status, "Approved")` |
-| List-price sales | `SUMIFS(list_price, status, "Approved")` |
-| Profit proxy | `SUMIFS(profit, status, "Approved")`; source `profit = list_price - standard_cost` |
-| Margin | `profit_proxy / list_price_sales` |
-| Distinct customers | `COUNTUNIQUE(FILTER(customer_id, status="Approved"))` |
-| Average order value | `list_price_sales / approved_orders` |
-| Monthly / brand / category | Additional `COUNTIFS` and `SUMIFS` criteria |
-| Channels | Boolean TRUE/FALSE, or literal `UNKOWN` mapped to Unknown |
+| Схвалені транзакції | `COUNTIF(order_status, "Approved")` |
+| Продажі за прайсом | `SUMIFS(list_price, order_status, "Approved")` |
+| Розрахунковий прибуток | `SUMIFS(list_price-standard_cost, order_status, "Approved")` |
+| Маржа | Розрахунковий прибуток / продажі за прайсом |
+| Середній чек | Продажі за прайсом / схвалені транзакції |
+| Клієнти | `COUNTUNIQUE(FILTER(customer_id, Approved, not unkown))` |
+| Канал | Boolean TRUE/FALSE та окрема категорія `UNKOWN` |
 
-## Audit
+**Попередження:** сума `list_price` не підтверджує фактичну сплачену виручку; витрати на маркетинг, логістику, оренду, податки тощо не включено до показника прибутку.
 
-- Monthly, channel, and product-line totals reconcile to overall approved KPIs.
-- Regional snapshot approved orders and list-price sales reconcile to the all-brand approved total.
-- Native dashboard calculation integrity is checked in **Portfolio Metrics!A57:B64**; status **PASS** under All brands.
-- Changing the brand dropdown to Solex and back was tested; all-brand values restored.
+## 3. RFM на Google Sheets
 
-## Important qualifications
+Дата відліку: **01.01.2018**; період транзакцій: календарний 2017 рік.
 
-1. **List price ≠ settled sales revenue.** The source does not document discounts, payment adjustments, returns, shipping or tax.
-2. **Profit proxy ≠ net profit.** Indirect expenses and taxes are not subtracted.
-3. **Regional numbers are static.** The live source's external address import is blocked without Google Sheets URL authorization, so the published aggregate comes from an audited XLSX address-table snapshot.
-4. **No source PII is published.** The raw training workbook and customer names/addresses are intentionally not in this repository.
-5. **Attribution:** based on guided course practice; new analyses and dashboard are original additions.
+- **Recency (R)** — кількість днів від останнього схваленого замовлення до дати відліку.
+- **Frequency (F)** — кількість схвалених замовлень клієнта.
+- **Monetary (M)** — сума `list_price` за його схваленими замовленнями.
+- Значення переводяться у шкалу **1–4** за 25-м, 50-м та 75-м перцентилями (`PERCENTILE`), де 4 — кращий результат.
+- **Активні цінні:** R≥3, F≥3, M≥3.
+- **Цінні, неактивні:** R≤2, F≥3, M≥3.
+- **Активні, купують рідко:** R≥3, F≤2.
+- **Інші:** всі інші поєднання.
+
+RFM — навчальна сегментація відносно **одного року**, без прогнозу відтоку.
+
+## 4. Аудит
+
+У вкладці **Розрахунки** звірено підсумки за місяцями, каналами, категоріями та загальні KPI. Під час перевірки контрольний блок повертає **«ПРОЙДЕНО»**. Перемикач бренду перевірено на Solex із поверненням до загальних показників.
+
+## 5. Регіональні дані
+
+Адреси з оригінального експорту нормалізовано до NSW, VIC, QLD; **87** схвалених транзакцій позначено як незіставлені. Зараз повторне live-об'єднання `Transactions clean.customer_id` з імпортованим `Address_clean` дає розбіжності; з цієї причини для географії показано **статичний звірений знімок**, а не удавано динамічну аналітику.
+
+## 6. Репродукованість і джерела
+
+Детальні формули та RFM-розрахунки знаходяться в приватній Google-таблиці. Публічні CSV містять лише агреговані показники, без персональних атрибутів.
+
+Основа: [навчальний курс Нікіти Тимошенка](https://youtu.be/gYjQRW6N6Ws). Чотири надані PDF-звіти з KPMG Data Analytics Virtual Program використано для орієнтиру щодо структури Data Quality / EDA / Retention / RFM. Розрахунки іншого прикладу не копіювалися.
